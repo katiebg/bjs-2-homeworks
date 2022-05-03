@@ -24,19 +24,19 @@ Student.prototype.addMark = function (mark) {
 
 Student.prototype.addMarks = function (...marks){
   if(this.marks === undefined){ 
-    this.marks = marks;
-    } else {
-      this.marks.push(marks);
-    }
+    this.marks = [];
+
+    } 
+    this.marks.push(...marks);
+    
 }
 
 Student.prototype.getAverage = function (){
   let sum = 0;
   if(this.marks === undefined){ 
-    this.average = undefined;
+    return 0;
     } else {
-      this.marks.forEach((item) => {sum += (item)});
-      return sum / this.marks.length; 
+      return (this.marks.reduce((sum, current) => sum + current, 0)) / this.marks.length; 
     }
 }
 
