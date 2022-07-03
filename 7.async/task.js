@@ -1,26 +1,28 @@
-class AlarmClock{
+class AlarmClock {
 
-    constructor(){
+    constructor() {
         this.alarmCollection = [];
         this.timerId = null;
     }
-    
-    addClock (startTime, callback, id) {
-        if (typeof id == undefined){
+
+    addClock(startTime, callback, id) {
+        if (!id) {
             throw new Error('id не передан')
-        } else if (this.alarmCollection.find(item => item.id === id)){
+        } else if (this.alarmCollection.find(item => item.id === id)) {
             return (console.error('Уже существует звонок с таким id '))
-        } else {return ( this.alarmCollection.push({id: this.id, time: this.startTime, callback: this.callback}))}
+        } else {
+            this.alarmCollection.push({ id: id, time: startTime, callback: callback });
+        }
     }
 
-    removeClock (id) {
+    removeClock(id) {
         let inputArrLength = this.alarmCollection.length;
-        this.alarmCollection.filter(item => item.id !== id)
+        this.alarmCollection = this.alarmCollection.filter(item => item.id !== id)
         let outputArrLength = this.alarmCollection.length;
         return outputArrLength < inputArrLength;
     }
 
-    getCurrentFormattedTime () {
+    getCurrentFormattedTime() {
         let zeroAdd = (number) => {
             if (number < 10) {
                 return '0' + number;
@@ -34,30 +36,57 @@ class AlarmClock{
 
     }
 
+   /* start() {
+        let checkClock = (clock) => {
+            if (clock.time === getCurrentFormattedTime()) {
+                clock.callback;
+            };
+        }
+        if (!this.timerId) {
+            this.alarmCollection.forEach ((item) => checkClock(item));
+        }
+    }*/
+
     start () {
-        function checkClock (clock) {
-            if (clock.time === getCurrentFormattedTime()){
-                return clock.callback;
+        let checkClock = (clock) => {
+            if (clock.time === getCurrentFormattedTime()) {
+                clock.callback();
             }
         }
-    }
-
-    stop () {
-        if (this.timerId !== null){
-            clearInterval(this.timerId);
-            return this.timerId = null;
+        if (this.timerId === null) {
+            this.timerId = setInterval(() => {
+                this.alarmCollection.forEach(clock => checkClock(clock));
+            }, 1000);
         }
     }
 
-    printAlarms (){
-        this.alarmCollection.forEach(console.log(this.alarmCollection.id, this.alarmCollection.time))
+    stop() {
+        if (this.timerId !== null) {
+            clearInterval(this.timerId);
+            this.timerId = null;
+        }
     }
 
-    clearAlarms (){
+    printAlarms() {
+        return this.alarmCollection.forEach((item) => (item.id, item.time))
+    }
+
+    clearAlarms() {
         this.stop();
         this.alarmCollection = [];
     }
-
-
-
 }
+
+function testCase () {
+    let PhoneClock = new AlarmClock();
+    PhoneClock.addClock("17:36", () => console.log("Get up!"), 1);
+    PhoneClock.addClock("17:37", () => console.log("Подъем!"), 2 );
+    PhoneClock.removeClock(2);
+    PhoneClock.addClock("17:38", () => console.log("Вставай!"), 3);
+    PhoneClock.start();
+    PhoneClock.stop();
+    PhoneClock.printAlarms();
+    PhoneClock.clearAlarms();
+}
+
+
