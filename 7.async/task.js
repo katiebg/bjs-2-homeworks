@@ -36,20 +36,9 @@ class AlarmClock {
 
     }
 
-   /* start() {
-        let checkClock = (clock) => {
-            if (clock.time === getCurrentFormattedTime()) {
-                clock.callback;
-            };
-        }
-        if (!this.timerId) {
-            this.alarmCollection.forEach ((item) => checkClock(item));
-        }
-    }*/
-
     start () {
         let checkClock = (clock) => {
-            if (clock.time === getCurrentFormattedTime()) {
+            if (clock.time === this.getCurrentFormattedTime()) {
                 clock.callback();
             }
         }
@@ -68,7 +57,7 @@ class AlarmClock {
     }
 
     printAlarms() {
-        return this.alarmCollection.forEach((item) => (item.id, item.time))
+        this.alarmCollection.forEach((item) => console.log(item.id, item.time))
     }
 
     clearAlarms() {
