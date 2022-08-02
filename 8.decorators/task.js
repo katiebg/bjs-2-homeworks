@@ -1,47 +1,48 @@
-
 function cachingDecoratorNew(func) {
   let cache = [];
-
-  function wrapper(...args) {
-    const hash = args.join(","); // получаем правильный хэш
-    let idx = cache.findIndex((item, idx) => item[idx].hash === hash); // ищем элемент, хэш которого равен нашему хэшу
-    if (idx !== -1) { // если элемент  найден
-      console.log("Из кэша: " + cache[idx].result); // индекс нам известен, по индексу в массиве лежит объект, как получить нужное значение?
-      return "Из кэша: " + cache[idx].result;
+  function wrapper(...rest) {
+    let hash = rest.join(',');
+    let existResult = cache.filter(cacheRecord => cacheRecord.hash === hash);
+    if (existResult.length === 1) {
+      console.log('Из кэша: ' + existResult[0].value);
+      return 'Из кэша: ' + existResult[0].value;
     }
-
-    let result = func(...args); // в кэше результата нет - придётся считать
-    cache.push({ hash: hash, result: result }); // добавляем элемент с правильной структурой
-    if (cache.length > 5) {
-      cache.shift() // если слишком много элементов в кэше надо удалить самый старый (первый) 
+    else {
+      let value = func.call(this, ...rest);
+      console.log('Вычисляем: ' + value);
+      if (cache.length < 5) {
+        cache.push({ hash, value });
+      }
+      else {
+        cache.unshift({ hash, value });
+        cache.pop();
+      }
+      return 'Вычисляем: ' + value;
     }
-    console.log("Вычисляем: " + result);
-    return "Вычисляем: " + result;
   }
   return wrapper;
 }
 
-function debounceDecoratorNew(f, ms) {
+function debounceDecoratorNew(func, ms) {
   let timeout;
-  f(...args);
+  func(...rest);
   let flag = true;
-  return function (...args) {
+  return function (...rest) {
     clearTimeout(timeout);
     timeout = setTimeout(() => {
       if (!flag) {
-        f.apply(this, args);
+        func.call(this, ...rest);
         flag = true;
       }
     }, ms);
   };
 }
 
-
-function debounceDecorator2(func) {
+function debounceDecorator2(debounceDecoratorNew) {
   let count = 0;
-  function wrapper(...args) {
-    count++;
-    debounceDecoratorNew.call(this, ...args);
+  function wrapper(...rest) {
+    wrapper.history = count++;
+    return debounceDecoratorNew.call(this, ...rest);
   }
   return wrapper;
 }
